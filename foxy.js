@@ -33,10 +33,19 @@ class Foxy {
     if (methods) {
       this.methods = methods;
     }
-    const elements = document.querySelectorAll("*[r-onclick]");
-    for (let e of elements) {
-      const fn = e.getAttribute("r-onclick");
-      e.addEventListener("click", this.methods[fn].bind(this.data));
+    var nodesSnapshot = document.evaluate(
+      '//*/attribute::*[starts-with(name(), "f-")]',
+      document,
+      null,
+      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+      null
+    );
+    for (let i = 0; i < nodesSnapshot.snapshotLength; i++) {
+      const element = nodesSnapshot.snapshotItem(i).ownerElement;
+      const name = nodesSnapshot.snapshotItem(i).name;
+      const eventname = name.substring(2);
+      const fn = element.getAttribute(name);
+      element.addEventListener(eventname, this.methods[fn].bind(this.data));
     }
   }
   set(arg, value) {
